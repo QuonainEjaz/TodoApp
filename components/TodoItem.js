@@ -11,11 +11,6 @@ export default function TodoItem({
   // A function that is called when the user presses the "DELETE" button.
   // It is given the id of the todo that the user is pressing the button for.
   onDelete,
-  // A boolean that indicates whether the checkbox next to the todo should be checked.
-  isChecked,
-  // A function that is called when the user checks the checkbox next to the todo.
-  // It is given a boolean that indicates the new state of the checkbox.
-  setIsChecked,
 }) {
   return (
     <View style={styles.todoContainer}>
@@ -79,7 +74,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     width: 590,
-    height: 50,
-    marginBottom: 15,
+    maxHeight: 50,
   },
 });

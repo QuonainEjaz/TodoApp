@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, TextInput, Button, View, FlatList, Text, Keyboard, Alert } from 'react-native';
 import TodoItem from './components/TodoItem';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function App() {
@@ -23,7 +24,25 @@ export default function App() {
   // If the user is not editing any todo, it is null.
   // It is initialized to null.
   const [editingId, setEditingId] = useState(null);
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+  useEffect(() => {
+      saveTodosToStorage();
+  },[todos])
+  // This function fetches the list of todos from AsyncStorage.
+  // It is called when the app starts.
+  const fetchTodos = async () => {
+      const storedTodos = await AsyncStorage.getItem('todos');
+        setTodos(JSON.parse(storedTodos));
+  };
+  const saveTodosToStorage = async () => {
+      await AsyncStorage.setItem('todos', JSON.stringify(todos));
+  };
 
+  
+
+ 
   // This function changes the title of the input state variable.
   // It is called when the user changes the text in the title input field.
   const handleTitleChange = (text) => {
@@ -111,6 +130,7 @@ export default function App() {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
     // Set isEditing to false to indicate that the user is not editing any todo.
     setIsEditing(false);
+  
   };
 
   return (
@@ -128,6 +148,7 @@ export default function App() {
           style={styles.inputDesc}
           placeholder="Description (optional):"
           multiline={true}
+          
           value={input.desc}
           onChangeText={handleDescChange}
         />
@@ -184,6 +205,8 @@ const styles = StyleSheet.create({
     height: 50,
   },
   inputDesc: {
+    verticalAlign: 'top',
+    paddingLeft: 20,
     borderWidth: 1,
     borderColor: 'green',
     borderRadius: 5,
@@ -191,5 +214,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFAF0',
     width: 380,
     height: 100,
+    marginBottom: 5,
   },
 });
