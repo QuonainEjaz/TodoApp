@@ -1,10 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, TextInput, Button, View, FlatList, Text, Keyboard, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet, TextInput, Button, View, FlatList, Text, Keyboard, Alert, Image } from 'react-native';
 import TodoItem from './components/TodoItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // A 3-second loading time
+    const timer = setTimeout(() => {setIsLoading(false);  // Hide the loader after 3 seconds
+    }, 3000);
+
+    // Clear timeout if the component is unmounted
+    return () => clearTimeout(timer);
+  }, []);
+
+  
   // This state variable holds the list of todos.
   // It is initialized to an empty array.
   const [todos, setTodos] = useState([]);
@@ -33,15 +45,12 @@ export default function App() {
   // This function fetches the list of todos from AsyncStorage.
   // It is called when the app starts.
   const fetchTodos = async () => {
-      const storedTodos = await AsyncStorage.getItem('todos');
-        setTodos(JSON.parse(storedTodos));
+    const storedTodos = await AsyncStorage.getItem('todos');
+    setTodos(storedTodos ? JSON.parse(storedTodos) : []);    
   };
   const saveTodosToStorage = async () => {
       await AsyncStorage.setItem('todos', JSON.stringify(todos));
   };
-
-  
-
  
   // This function changes the title of the input state variable.
   // It is called when the user changes the text in the title input field.
@@ -97,7 +106,7 @@ export default function App() {
       setTodos([...todos, { id: Date.now().toString(), title: input.title, desc: input.desc }]);
     };
     // Reset the input state variable to empty strings.
-    setInput('');
+    setInput({ title: '', desc: '' });
   };
 
   // This function edits an existing todo.
@@ -132,7 +141,16 @@ export default function App() {
     setIsEditing(false);
   
   };
-
+  if (isLoading) {
+    return (
+      <View style={styles.loadercontainer}>
+        <Image 
+          source={require('./assets/pics/loader.png')} 
+          style={styles.loaderImage}
+        />
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Todo List</Text>
@@ -178,8 +196,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'lightyellow',
     padding: 20,
-
-
   },
   title: {
     fontSize: 30,
@@ -216,4 +232,14 @@ const styles = StyleSheet.create({
     height: 100,
     marginBottom: 5,
   },
+  loadercontainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loaderImage: {
+    width: '61%',
+    height: '30%',
+  },
+
 });
